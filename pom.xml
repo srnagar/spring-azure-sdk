@@ -15,26 +15,20 @@
   <version>1.0-SNAPSHOT</version>
 
   <dependencies>
+    <!-- Spring Boot web starter -->
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-web</artifactId>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.azure/azure-identity -->
+    <!-- Azure Identity -->
     <dependency>
       <groupId>com.azure</groupId>
       <artifactId>azure-identity</artifactId>
       <version>1.0.0-preview.1</version>
     </dependency>
 
-    <!-- https://mvnrepository.com/artifact/com.azure/azure-keyvault-parent -->
-    <dependency>
-      <groupId>com.azure</groupId>
-      <artifactId>azure-keyvault-parent</artifactId>
-      <version>4.0.0-preview.1</version>
-      <type>pom</type>
-    </dependency>
-
+    <!-- Azure KeyVault - Keys -->
     <dependency>
       <groupId>com.azure</groupId>
       <artifactId>azure-keyvault-keys</artifactId>
