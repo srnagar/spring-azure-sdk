@@ -11,7 +11,7 @@
   </parent>
 
   <groupId>com.azsdk</groupId>
-  <artifactId>azuresdktest</artifactId>
+  <artifactId>springazuresdk</artifactId>
   <version>1.0-SNAPSHOT</version>
 
   <dependencies>
