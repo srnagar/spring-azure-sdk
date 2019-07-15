@@ -1,45 +1,40 @@
 package com.azuresdk.controller;
 
-import com.azure.core.util.logging.ClientLogger;
-import com.azure.identity.credential.DefaultAzureCredential;
-import com.azure.security.keyvault.keys.KeyAsyncClient;
-import com.azure.security.keyvault.keys.KeyClient;
 import com.azuresdk.services.KeyVaultService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class AzureController {
-  private static final ClientLogger LOGGER = new ClientLogger(AzureController.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(AzureController.class);
 
   @Autowired
   private KeyVaultService keyVaultService;
 
-  @GetMapping(path = "/kv/sync")
-  public String testSync() {
+  @GetMapping(path = "/key_vault/list_keys")
+  public String listKeys(@RequestParam(value = "async", required = false, defaultValue = "false") boolean isAsync) {
+    LOGGER.info("Listing KeyVault keys using " + (isAsync ? "async" : "sync") + " key client");
     try {
-      keyVaultService
-          .listKeys()
-          .forEach(keyBase -> LOGGER.asInfo().log(keyBase.name()));
-      return "Successfully ran all KeyVault Keys sync tests";
+      StringBuilder sb = new StringBuilder();
+      if (isAsync) {
+        keyVaultService
+            .listKeysAsync()
+            .doOnNext(keyBase -> sb.append(keyBase.name()).append(", "))
+            .subscribe();
+      } else {
+        keyVaultService
+            .listKeys()
+            .forEach(keyBase -> sb.append(keyBase.name()).append(", "));
+      }
+      LOGGER.info("Successfully listed KeyVault keys");
+      return sb.deleteCharAt(sb.length() - 1).toString();
     } catch (Exception ex) {
-      LOGGER.asError().log("Failed to run KeyVault sync tests", ex.getMessage());
-      return "Failed to run KeyVault sync tests";
-    }
-  }
-
-  @GetMapping(path = "/kv/async")
-  public String testAsync() {
-    try {
-      keyVaultService
-          .listKeysAsync()
-          .doOnNext(keyBase -> LOGGER.asInfo().log(keyBase.name()))
-          .subscribe();
-      return "Successfully ran all KeyVault Keys async tests";
-    } catch (Exception ex) {
-      LOGGER.asError().log("Failed to run KeyVault async tests", ex.getMessage());
-      return "Failed to run KeyVault async tests " + ex.getMessage();
+      LOGGER.error("Failed to list KeyVault keys", ex.getMessage());
+      return "Failed to list KeyVault keys";
     }
   }
 }
